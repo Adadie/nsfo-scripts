@@ -1,0 +1,22 @@
+{
+  "name": "etl-scripts",
+  "version": "1.0.0",
+  "description": "Extraction, Transformation and Loading Scripts for Kringloop",
+  "main": "index.ts",
+  "author": "Adadie",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --trace-warnings --loader ts-node/esm index.ts",
+    "dev": "npx tsx index.ts"
+  },
+  "dependencies": {
+    "@types/node": "^20.11.26",
+    "axios": "^1.6.7",
+    "esm": "^3.2.25",
+    "lodash": "^4.17.21",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2"
+  }
+}
