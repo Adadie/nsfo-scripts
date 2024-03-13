@@ -32,7 +32,6 @@ const populateDB = () => {
         url: `${API_URL}/surveys`,
       })
       .then((response) => {
-        console.log("resssssssssssss",response.data.data);
         surveyId = response.data.data.id;
         console.log("survey id>>>>>>>>>>>>>>>>>>>>>>",surveyId);
         data.sections.forEach((section) => {
@@ -49,7 +48,7 @@ const populateDB = () => {
               url: `${API_URL}/sections`,
             })
             .then((response) => {
-              console.log(response);
+              console.log("sectionId>>>>>>>>>>>>>>>>>>>>>>>",response.data.data.id);
               sectionId = response.data.data.id;
               console.log('Section >>>>>>>>>>>>>>>>>>>', sectionId);
               section.subSections.forEach((subSection) => {
@@ -80,6 +79,7 @@ const populateDB = () => {
                         maximumScore: question.maximumScore,
                         surveyId: surveyId,
                         subSectionId: subSectionId,
+                        sectionId: sectionId,
                       };
                       axios
                         .request({
@@ -98,7 +98,7 @@ const populateDB = () => {
                           /**
                            * Check if choices exist and also create choices
                            */
-                          if (question.type === 'MULTIPLE_CHOICE' && question.choices) {
+                          if (response.data.data.type === 'MULTIPLE_CHOICE' && response.data.data.choices) {
                             question.choices.forEach((choice) => {
                               choiceData = {
                                 text: choice.text,
