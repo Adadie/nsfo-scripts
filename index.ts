@@ -71,7 +71,8 @@ const populateDB = () => {
                       questionData = {
                         text: question.text,
                         type: question.type,
-                        answerElement: question.answerElement,
+                        htmlElement: question.htmlElement,
+                        inputIcon: question.inputIcon,
                         answerDataType: question.answerDataType,
                         canSkip: question.canSkip,
                         graded: question.graded,
@@ -98,7 +99,7 @@ const populateDB = () => {
                           /**
                            * Check if choices exist and also create choices
                            */
-                          if (response.data.data.type === 'MULTIPLE_CHOICE' && response.data.data.choices) {
+                          if (question.type === 'MULTIPLE_CHOICE' && question.choices) {
                             question.choices.forEach((choice) => {
                               choiceData = {
                                 text: choice.text,
