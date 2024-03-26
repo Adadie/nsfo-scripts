@@ -7,6 +7,7 @@ let sectionId;
 let subSectionId;
 let questionId;
 let choiceId;
+let surveySectionId;
 
 let surveyData;
 let sectionData;
@@ -33,7 +34,7 @@ const populateDB = () => {
       })
       .then((response) => {
         surveyId = response.data.data.id;
-        console.log("survey id>>>>>>>>>>>>>>>>>>>>>>",surveyId);
+        console.log('survey id>>>>>>>>>>>>>>>>>>>>>>', surveyId);
         data.sections.forEach((section) => {
           sectionData = {
             title: section.title,
@@ -47,9 +48,13 @@ const populateDB = () => {
               data: sectionData,
               url: `${API_URL}/sections`,
             })
-            .then((response) => {
-              console.log("sectionId>>>>>>>>>>>>>>>>>>>>>>>",response.data.data.id);
-              sectionId = response.data.data.id;
+            .then((sectionResponse) => {
+              console.log(
+                'sectionId>>>>>>>>>>>>>>>>>>>>>>>',
+                sectionResponse.data.data.id
+              );
+              sectionId = sectionResponse.data.data.id;
+              surveySectionId = sectionResponse.data.data.id;
               console.log('Section >>>>>>>>>>>>>>>>>>>', sectionId);
               section.subSections.forEach((subSection) => {
                 subSectionData = {
@@ -80,7 +85,7 @@ const populateDB = () => {
                         maximumScore: question.maximumScore,
                         surveyId: surveyId,
                         subSectionId: subSectionId,
-                        sectionId: sectionId,
+                        sectionId: sectionResponse.data.data.id,
                       };
                       axios
                         .request({
@@ -95,11 +100,14 @@ const populateDB = () => {
                             'Question >>>>>>>>>>>>>>>>>>>',
                             questionId
                           );
-                          
+
                           /**
                            * Check if choices exist and also create choices
                            */
-                          if (question.type === 'MULTIPLE_CHOICE' && question.choices) {
+                          if (
+                            question.type === 'MULTIPLE_CHOICE' &&
+                            question.choices
+                          ) {
                             question.choices.forEach((choice) => {
                               choiceData = {
                                 text: choice.text,
@@ -116,7 +124,10 @@ const populateDB = () => {
                                   console.log(response);
                                 })
                                 .catch((error) =>
-                                  console.log('Error caught ()', error.response.data)
+                                  console.log(
+                                    'Error caught ()',
+                                    error.response.data
+                                  )
                                 );
                             });
                           }

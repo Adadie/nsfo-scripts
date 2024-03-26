@@ -1,7 +1,7 @@
 export const data = {
-  title: 'Kringloop Label',
-  description: 'Kringloop Label',
-  year: 2022,
+  title: 'QM Label',
+  description: 'QM Label',
+  year: 2023,
   valid: true,
   sections: [
     {
