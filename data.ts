@@ -1,7 +1,7 @@
 export const data = {
-  title: 'Latest',
+  title: 'Kringlooplabel',
   description: 'QM Label',
-  year: 2024,
+  year: 2023,
   valid: true,
   sections: [
     {
@@ -18,10 +18,12 @@ export const data = {
             {
               text: 'Wat is het ras van jouw schapen?',
               type: 'MULTIPLE_CHOICE',
+              answerDataType: 'STRING',
               htmlElement: 'DROPDOWN',
               graded: false,
               position: 1,
               maximumScore: 0,
+              canSkip: false,
               surveyId: 1,
               subSectionId: 1,
               choices: [
@@ -220,6 +222,7 @@ export const data = {
               htmlElement: 'INPUTBOX',
               answerDataType: 'NUMBER',
               inputIcon: 'NUT',
+              canSkip: false,
               graded: false,
               position: 1,
               maximumScore: 0,

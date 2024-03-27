@@ -2,148 +2,80 @@ import axios from 'axios';
 import { API_URL } from './config';
 import { data } from './data';
 
-let surveyId;
-let sectionId;
-let subSectionId;
-let questionId;
-let choiceId;
-let surveySectionId;
-
-let surveyData;
-let sectionData;
-let subSectionData;
-let questionData;
-let choiceData;
-
-const populateDB = () => {
+const populateDB = async () => {
   try {
     console.log('starting ....');
-    // const payload = data;
-    surveyData = {
+    const surveyData = {
       title: data.title,
       description: data.description,
       year: data.year,
       valid: data.valid,
     };
 
-    axios
-      .request({
-        method: 'POST',
-        data: surveyData,
-        url: `${API_URL}/surveys`,
-      })
-      .then((response) => {
-        surveyId = response.data.data.id;
-        console.log('survey id>>>>>>>>>>>>>>>>>>>>>>', surveyId);
-        data.sections.forEach((section) => {
-          sectionData = {
-            title: section.title,
-            position: section.position,
-            survey: surveyId,
-            canSkip: section.canSkip,
-          };
-          axios
-            .request({
-              method: 'POST',
-              data: sectionData,
-              url: `${API_URL}/sections`,
-            })
-            .then((sectionResponse) => {
-              console.log(
-                'sectionId>>>>>>>>>>>>>>>>>>>>>>>',
-                sectionResponse.data.data.id
-              );
-              sectionId = sectionResponse.data.data.id;
-              surveySectionId = sectionResponse.data.data.id;
-              console.log('Section >>>>>>>>>>>>>>>>>>>', sectionId);
-              section.subSections.forEach((subSection) => {
-                subSectionData = {
-                  title: subSection.title,
-                  position: subSection.position,
-                  section: sectionId,
-                };
-                axios
-                  .request({
-                    method: 'POST',
-                    data: subSectionData,
-                    url: `${API_URL}/sub-sections`,
-                  })
-                  .then((response) => {
-                    console.log(response);
-                    subSectionId = response.data.data.id;
-                    console.log('SubSection >>>>>>>>>>>>>>>>>>>', subSectionId);
-                    subSection.questions.forEach((question) => {
-                      questionData = {
-                        text: question.text,
-                        type: question.type,
-                        htmlElement: question.htmlElement,
-                        inputIcon: question.inputIcon,
-                        answerDataType: question.answerDataType,
-                        canSkip: question.canSkip,
-                        graded: question.graded,
-                        position: question.position,
-                        maximumScore: question.maximumScore,
-                        surveyId: surveyId,
-                        subSectionId: subSectionId,
-                        sectionId: sectionResponse.data.data.id,
-                      };
-                      axios
-                        .request({
-                          method: 'POST',
-                          data: questionData,
-                          url: `${API_URL}/questions`,
-                        })
-                        .then((response) => {
-                          console.log(response);
-                          questionId = response.data.data.id;
-                          console.log(
-                            'Question >>>>>>>>>>>>>>>>>>>',
-                            questionId
-                          );
+    const surveyResponse = await axios.post(`${API_URL}/surveys`, surveyData);
+    const surveyId = surveyResponse.data.data.id;
+    console.log('survey id>>>>>>>>>>>>>>>>>>>>>>', surveyId);
 
-                          /**
-                           * Check if choices exist and also create choices
-                           */
-                          if (
-                            question.type === 'MULTIPLE_CHOICE' &&
-                            question.choices
-                          ) {
-                            question.choices.forEach((choice) => {
-                              choiceData = {
-                                text: choice.text,
-                                score: choice.score,
-                                questionId: questionId,
-                              };
-                              axios
-                                .request({
-                                  method: 'POST',
-                                  data: choiceData,
-                                  url: `${API_URL}/choices`,
-                                })
-                                .then((response) => {
-                                  console.log(response);
-                                })
-                                .catch((error) =>
-                                  console.log(
-                                    'Error caught ()',
-                                    error.response.data
-                                  )
-                                );
-                            });
-                          }
-                        })
-                        .catch((error) =>
-                          console.log('Error caught ()', error)
-                        );
-                    });
-                  })
-                  .catch((error) => console.log('Error caught ()', error));
-              });
-            })
-            .catch((error) => console.log('Error caught ()', error));
-        });
-      })
-      .catch((error) => console.log('Error caught ()', error));
+    for (const section of data.sections) {
+      const sectionData = {
+        title: section.title,
+        position: section.position,
+        survey: surveyId,
+        canSkip: section.canSkip,
+      };
+
+      const sectionResponse = await axios.post(`${API_URL}/sections`, sectionData);
+      const sectionId = sectionResponse.data.data.id;
+      console.log('sectionId>>>>>>>>>>>>>>>>>>>>>>>', sectionId);
+      const surveySectionId = sectionResponse.data.data.id;
+      console.log('Section >>>>>>>>>>>>>>>>>>>', sectionId);
+
+      for (const subSection of section.subSections) {
+        const subSectionData = {
+          title: subSection.title,
+          position: subSection.position,
+          section: sectionId,
+        };
+
+        const subSectionResponse = await axios.post(`${API_URL}/sub-sections`, subSectionData);
+        const subSectionId = subSectionResponse.data.data.id;
+        console.log('SubSection >>>>>>>>>>>>>>>>>>>', subSectionId);
+
+        for (const question of subSection.questions) {
+          const questionData = {
+            text: question.text,
+            type: question.type,
+            htmlElement: question.htmlElement,
+            inputIcon: question.inputIcon,
+            answerDataType: question.answerDataType,
+            canSkip: question.canSkip ?? false,
+            graded: question.graded,
+            position: question.position,
+            maximumScore: question.maximumScore,
+            surveyId: surveyId,
+            subSectionId: subSectionId,
+            sectionId: sectionResponse.data.data.id,
+          };
+
+          const questionResponse = await axios.post(`${API_URL}/questions`, questionData);
+          const questionId = questionResponse.data.data.id;
+          console.log('Question >>>>>>>>>>>>>>>>>>>', questionId);
+
+          if ((question.type === 'MULTIPLE_CHOICE' || question.type === 'MULTIPLE_CHOICE') && question.choices) {
+            for (const choice of question.choices) {
+              const choiceData = {
+                text: choice.text,
+                score: choice.score,
+                questionId: questionId,
+              };
+
+              await axios.post(`${API_URL}/choices`, choiceData);
+            }
+          }
+        }
+      }
+    }
+
     console.log('ending ....');
   } catch (error) {
     console.error('Error caught ()', error);
